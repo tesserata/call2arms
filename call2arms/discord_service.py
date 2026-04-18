@@ -5,8 +5,7 @@ from discord.ext.commands.bot import Bot
 from discord.utils import get
 
 from call2arms.exceptions import (
-    ChannelNotFoundException,
-    RoleNotFoundException,
+    InstanceNotFoundException,
 )
 
 
@@ -22,7 +21,9 @@ class DiscordService:
             not isinstance(channel, discord.guild.TextChannel)
             and not isinstance(channel, discord.threads.Thread)
         ) or not channel:
-            raise ChannelNotFoundException(channel_id)
+            raise InstanceNotFoundException(
+                instance_type="channel", instance_id=channel_id
+            )
 
         return channel
 
@@ -33,12 +34,13 @@ class DiscordService:
         message = await channel.send(message_content)
         return message
 
-    async def get_role_mention(self, role_id: int) -> str:
-        role_instance = get(
-            self.bot.guilds[0].roles, id=role_id
-        )  # hardcoded for use in one server
+    async def get_role_mention(self, guild_id: int, role_id: int) -> str:
+        guild = self.bot.get_guild(guild_id)
+        if not guild:
+            raise InstanceNotFoundException(instance_type="guild", instance_id=role_id)
+        role_instance = get(guild.roles, id=role_id)
         if not role_instance:
-            raise RoleNotFoundException(role_id=role_id)
+            raise InstanceNotFoundException(instance_type="role", instance_id=role_id)
         return role_instance.mention
 
     @staticmethod

@@ -36,10 +36,6 @@ class CallToArmsBot(commands.Bot):
         )
         self.tree.add_command(cmd, guild=guild)
 
-        logger.info("Local guild commands: {}", [c.name for c in self.tree.get_commands(guild=guild)])
-        synced = await self.tree.sync(guild=guild)
-        logger.info("Synced guild commands: {}", [c.name for c in synced])
-
         if not self.post_session_announcement.is_running():
             self.post_session_announcement.start()
 
@@ -54,28 +50,33 @@ class CallToArmsBot(commands.Bot):
         logger.exception("App command failed: {}", error)
         try:
             if interaction.response.is_done():
-                await interaction.followup.send(f"Command failed: {error}", ephemeral=True)
+                await interaction.followup.send(
+                    f"Command failed: {error}", ephemeral=True
+                )
             else:
-                await interaction.response.send_message(f"Command failed: {error}", ephemeral=True)
+                await interaction.response.send_message(
+                    f"Command failed: {error}", ephemeral=True
+                )
         except Exception:
             logger.exception("Failed to send interaction error response")
 
     async def _post_announcement(self, force: bool = False) -> None:
         if force or datetime.datetime.utcnow().weekday() == 2:
             logger.info("Trying to post a vote")
-            party_tag = await self.discord_service.get_role_mention(self.config.TAG_ROLE_ID)
+            party_tag = await self.discord_service.get_role_mention(
+                guild_id=self.config.GUILD_ID, role_id=self.config.TAG_ROLE_ID
+            )
             message_content = get_session_message(party_tag=party_tag)
             message = await self.discord_service.send_message(
                 channel_id=self.config.TARGET_CHANNEL_ID,
                 message_content=message_content,
             )
-            await self.discord_service.add_reaction(message, "🐐")
-            await self.discord_service.add_reaction(message, "🚫")
+            await self.discord_service.add_reaction(message, ("🐐", "🚫"))
 
     async def post_vote_command(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer(ephemeral=True)
         await self._post_announcement(force=True)
-        await interaction.followup.send("Done.", ephemeral=True)
+        await interaction.followup.send("Done", ephemeral=True)
 
     @tasks.loop(time=datetime.time(hour=14, minute=0, tzinfo=datetime.timezone.utc))
     async def post_session_announcement(self) -> None:
