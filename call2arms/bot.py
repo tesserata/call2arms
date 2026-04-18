@@ -41,6 +41,11 @@ class CallToArmsBot(commands.Bot):
 
     async def on_ready(self) -> None:
         logger.info(f"{self.user} has connected to Discord!")
+        activity = discord.Activity(
+            type=discord.ActivityType.watching,
+            name="You must gather your party before venturing forth",
+        )
+        await self.change_presence(status=discord.Status.online, activity=activity)
 
     async def on_app_command_error(
         self,
