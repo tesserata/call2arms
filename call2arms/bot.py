@@ -67,7 +67,7 @@ class CallToArmsBot(commands.Bot):
             logger.exception("Failed to send interaction error response")
 
     async def _post_announcement(self, force: bool = False) -> None:
-        if force or datetime.datetime.utcnow().weekday() == 2:
+        if force or datetime.datetime.utcnow().weekday() == 1:
             logger.info("Trying to post a vote")
             party_tag = await self.discord_service.get_role_mention(
                 guild_id=self.config.GUILD_ID, role_id=self.config.TAG_ROLE_ID
