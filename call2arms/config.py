@@ -1,8 +1,11 @@
 import secrets
 from typing import Literal
-
+from enum import StrEnum, auto
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+class VoteWeekParity(StrEnum):
+    odd = auto()
+    even = auto()
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
@@ -19,6 +22,7 @@ class Config(BaseSettings):
     TARGET_CHANNEL_ID: int = -1
     TAG_ROLE_ID: int = -1
     GUILD_ID: int = -1
+    DEFAULT_WEEK_VOTE: VoteWeekParity = VoteWeekParity.odd
 
 
 def get_config() -> Config:
