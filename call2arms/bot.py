@@ -45,6 +45,13 @@ class CallToArmsBot(commands.Bot):
         )
         self.tree.add_command(set_vote_week_cmd, guild=guild)
 
+        synced = await self.tree.sync(guild=guild)
+        logger.info(
+            "Synced {} guild commands: {}",
+            len(synced),
+            [cmd.name for cmd in synced],
+        )
+
         if not self.post_session_announcement.is_running():
             self.post_session_announcement.start()
 
