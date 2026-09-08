@@ -134,13 +134,14 @@ class EditSessionView(_BaseLayout):
 
         if self.editable:
             row1 = discord.ui.ActionRow()
-            row1.add_item(
-                ActionButton(
-                    handler=self._change_time,
-                    label="Change time",
-                    style=discord.ButtonStyle.primary,
+            if not self.session.completed:
+                row1.add_item(
+                    ActionButton(
+                        handler=self._change_time,
+                        label="Change time",
+                        style=discord.ButtonStyle.primary,
+                    )
                 )
-            )
             row1.add_item(
                 ActionButton(
                     handler=self._back,
@@ -151,14 +152,15 @@ class EditSessionView(_BaseLayout):
             container.add_item(row1)
 
             row2 = discord.ui.ActionRow()
-            row2.add_item(
-                ActionButton(
-                    handler=self._cancel,
-                    label="Cancel session",
-                    style=discord.ButtonStyle.danger,
-                    disabled=self.session.cancelled,
+            if not self.session.completed:
+                row2.add_item(
+                    ActionButton(
+                        handler=self._cancel,
+                        label="Cancel session",
+                        style=discord.ButtonStyle.danger,
+                        disabled=self.session.cancelled,
+                    )
                 )
-            )
             row2.add_item(
                 ActionButton(
                     handler=self._delete,
