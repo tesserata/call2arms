@@ -81,7 +81,7 @@ class _PaginatedLayout(_BaseLayout):
                     discord.ui.TextDisplay(self.line(item)),
                     accessory=ActionButton(
                         handler=self._make_open(item),
-                        label="Open",
+                        label="View",
                         style=discord.ButtonStyle.secondary,
                     ),
                 )
