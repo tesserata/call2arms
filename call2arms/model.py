@@ -109,15 +109,15 @@ class Campaign:
 
     @property
     def sessions_count(self) -> int:
-        return len(self.sessions)
+        return len([s for s in self.sessions.values() if not s.cancelled])
 
     @property
     def past_sessions_count(self) -> int:
-        return len([s for s in self.sessions.values() if not s.upcoming])
+        return len([s for s in self.sessions.values() if not s.upcoming and not s.cancelled])
 
     @property
     def upcoming_sessions_count(self) -> int:
-        return len([s for s in self.sessions.values() if s.upcoming])
+        return len([s for s in self.sessions.values() if s.upcoming and not s.cancelled])
 
     @classmethod
     def from_dict(cls, data: dict):
