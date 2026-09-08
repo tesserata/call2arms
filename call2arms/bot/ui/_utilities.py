@@ -14,7 +14,7 @@ def parse_datetime(value: str) -> datetime:
     return parsed.astimezone(UTC)
 
 
-def fmt_ts(dt: datetime, style: str = "f") -> str:
+def fmt_ts(dt: datetime, style: str = "F") -> str:
     return f"<t:{int(dt.timestamp())}:{style}>"
 
 

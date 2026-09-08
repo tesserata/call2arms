@@ -5,20 +5,21 @@ from discord.ext import commands, tasks
 from loguru import logger
 
 from call2arms.bot.ui.sessions import SessionView
+from call2arms.bot.ui._utilities import session_line
 from call2arms.bot.discord_service import DiscordService
 from call2arms.config import Config
 from call2arms.model import Session
 from call2arms.storage import DataStore
 
 SESSION_MESSAGE = Template("""
-$party_tag Do we play at <t:$ts:f>?
+$party_tag Next session: $session_tag
 """)
 
 
-def get_session_message(party_tag: str, session_ts: int) -> str:
+def get_session_message(party_tag: str, session_tag: str) -> str:
     return SESSION_MESSAGE.substitute(
         party_tag=party_tag,
-        ts=session_ts,
+        session_tag=session_tag
     )
 
 
@@ -55,7 +56,7 @@ class BackgroundCog(commands.Cog):
         )
         message_content = get_session_message(
             party_tag=party_tag,
-            session_ts=int(session.starts_at.timestamp()),
+            session_tag=session_line(session),
         )
         message = await self.discord_service.send_message(
             channel_id=self.config.TARGET_CHANNEL_ID,
@@ -99,6 +100,8 @@ class BackgroundCog(commands.Cog):
             if not campaign.active:
                 continue
             for session in campaign.get_announced_sessions():
+                if session.confirmed:
+                    continue
                 votes = await self.discord_service.get_reaction_users(
                     session.announcement_channel_id,
                     session.announcement_message_id,
@@ -111,11 +114,15 @@ class BackgroundCog(commands.Cog):
                         session=session,
                         editable=False,
                     )
-                    message = await self.discord_service.send_view(
+                    await self.store.mark_session_confirmed(session.campaign_id, session.id)
+                    await self.discord_service.send_message(
+                        channel_id=self.config.TARGET_CHANNEL_ID,
+                        message_content="Session confirmed"
+                    )
+                    await self.discord_service.send_view(
                         channel_id=self.config.TARGET_CHANNEL_ID,
                         view=view,
                     )
-                    await self.store.mark_session_confirmed(session.campaign_id, session.id)
 
     @post_session_announcement.before_loop
     async def before_post_session_announcement(self) -> None:

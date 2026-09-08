@@ -56,13 +56,23 @@ class DiscordService:
         for reaction in reactions:
             await message.add_reaction(reaction)
 
-    async def get_reaction_users(self, channel_id, message_id, emoji) -> list[discord.User]:
+    async def get_reaction_users(
+        self,
+        channel_id: int,
+        message_id: int,
+        emoji: str,
+        target_role: int | None = None,
+    ) -> list[discord.User]:
         try:
             channel = await self.get_channel(channel_id)
             message = await channel.fetch_message(message_id)
             for reaction in message.reactions:
                 if str(reaction.emoji) == emoji:
-                    return [u async for u in reaction.users() if not u.bot]
+                    users = [u async for u in reaction.users() if not u.bot]
+                    if target_role:
+                        users = [u for u in users if get(u.roles, id=target_role)]
+
+                    return users
         except Exception as e:
             logger.exception(e)
 
