@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from call2arms.bot.discord_service import DiscordService
 from call2arms.bot.ui.campaigns import CampaignsView
-from call2arms.bot.ui.sessions import UpcomingSessionsView
+from call2arms.bot.ui.sessions import UpcomingSessionsView, SessionView
 from call2arms.config import Config
 from call2arms.storage import DataStore
 
@@ -29,3 +29,15 @@ class SessionsCog(commands.Cog):
         await interaction.response.send_message(view=view, ephemeral=True)
         view.message = await interaction.original_response()
 
+    @app_commands.command(name="next_session", description="View the next session")
+    async def get_next_session(self, interaction: discord.Interaction) -> None:
+        sessions = await self.store.get_upcoming_sessions()
+        sessions.sort(key=lambda s: s.starts_at)
+        view = await SessionView.create(
+            store=self.store,
+            discord_service=self.discord_service,
+            session=sessions[0],
+            editable=False,
+        )
+        await interaction.response.send_message(view=view, ephemeral=True)
+        view.message = await interaction.original_response()

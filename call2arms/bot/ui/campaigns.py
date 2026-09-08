@@ -12,7 +12,7 @@ from call2arms.bot.ui._base import (
     _PaginatedLayout,
 )
 from call2arms.bot.ui._utilities import parse_datetime, session_line
-from call2arms.bot.ui.sessions import EditSessionView
+from call2arms.bot.ui.sessions import SessionView
 from call2arms.model import Campaign, Session
 from call2arms.storage import DataStore
 from call2arms.config import get_config
@@ -215,7 +215,7 @@ class CampaignUpcomingView(_PaginatedLayout):
         return f"### {session_line(s)}"
 
     async def on_open(self, interaction: discord.Interaction, s: Session) -> None:
-        view = await EditSessionView.create(
+        view = await SessionView.create(
             store=self.store,
             discord_service=interaction.client.discord_service,
             session=s,
@@ -264,7 +264,7 @@ class CampaignHistoryView(_PaginatedLayout):
         return f"### {session_line(s)}"
 
     async def on_open(self, interaction: discord.Interaction, s: Session) -> None:
-        view = await EditSessionView.create(
+        view = await SessionView.create(
             store=self.store,
             discord_service=interaction.client.discord_service,
             session=s,

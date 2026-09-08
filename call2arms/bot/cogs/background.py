@@ -4,7 +4,7 @@ from string import Template
 from discord.ext import commands, tasks
 from loguru import logger
 
-from call2arms.bot.ui.sessions import EditSessionView
+from call2arms.bot.ui.sessions import SessionView
 from call2arms.bot.discord_service import DiscordService
 from call2arms.config import Config
 from call2arms.model import Session
@@ -105,7 +105,7 @@ class BackgroundCog(commands.Cog):
                     "🐐",
                 )
                 if len(votes) >= self.config.MIN_VOTES:
-                    view = await EditSessionView.create(
+                    view = await SessionView.create(
                         store=self.store,
                         discord_service=self.discord_service,
                         session=session,

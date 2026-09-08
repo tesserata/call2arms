@@ -26,7 +26,7 @@ class UpcomingSessionsView(_PaginatedLayout):
         return f"### {session_line(s)}"
 
     async def on_open(self, interaction: discord.Interaction, s: Session) -> None:
-        view = await EditSessionView.create(
+        view = await SessionView.create(
             store=self.store,
             discord_service=interaction.client.discord_service,
             session=s,
@@ -57,7 +57,7 @@ class UpcomingSessionsView(_PaginatedLayout):
         return cls(store, sessions)
 
 
-class EditSessionView(_BaseLayout):
+class SessionView(_BaseLayout):
     def __init__(
         self,
         store: DataStore,
@@ -84,7 +84,7 @@ class EditSessionView(_BaseLayout):
         session: Session,
         editable: bool = True,
         back_factory: Awaitable[Any] = None,
-    ) -> "EditSessionView":
+    ) -> "SessionView":
         return cls(
             store,
             discord_service,
@@ -217,7 +217,7 @@ class ChangeTimeModal(discord.ui.Modal, title="Change session time"):
     )
 
     def __init__(
-        self, store: DataStore, session: Session, edit_view: EditSessionView
+        self, store: DataStore, session: Session, edit_view: SessionView
     ) -> None:
         super().__init__()
         self.store = store
