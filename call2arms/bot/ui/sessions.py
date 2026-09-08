@@ -2,7 +2,6 @@ from typing import Any, Awaitable, Callable, Coroutine
 
 import discord
 
-from bot.ui import campaigns
 from call2arms.bot.discord_service import DiscordService
 from call2arms.bot.ui._base import (
     ActionButton,
