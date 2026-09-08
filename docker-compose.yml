@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - ./data_storage:/app/call2arms/data_storage
     env_file:
       - .env
     container_name: call2arms

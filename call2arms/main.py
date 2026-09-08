@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 
-from call2arms.bot import CallToArmsBot
+from call2arms.bot.bot import CallToArmsBot
 from call2arms.config import get_config
 
 

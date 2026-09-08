@@ -1,4 +1,5 @@
 from typing import Iterable
+from venv import logger
 
 import discord
 from discord.ext.commands.bot import Bot
@@ -34,6 +35,13 @@ class DiscordService:
         message = await channel.send(message_content)
         return message
 
+    async def send_view(
+        self, channel_id: int, view: discord.ui.View
+    ) -> discord.Message:
+        channel = await self.get_channel(channel_id)
+        message = await channel.send(view=view)
+        return message
+
     async def get_role_mention(self, guild_id: int, role_id: int) -> str:
         guild = self.bot.get_guild(guild_id)
         if not guild:
@@ -47,3 +55,15 @@ class DiscordService:
     async def add_reaction(message: discord.Message, reactions: Iterable[str]) -> None:
         for reaction in reactions:
             await message.add_reaction(reaction)
+
+    async def get_reaction_users(self, channel_id, message_id, emoji) -> list[discord.User]:
+        try:
+            channel = await self.get_channel(channel_id)
+            message = await channel.fetch_message(message_id)
+            for reaction in message.reactions:
+                if str(reaction.emoji) == emoji:
+                    return [u async for u in reaction.users() if not u.bot]
+        except Exception as e:
+            logger.exception(e)
+
+        return []

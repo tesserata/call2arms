@@ -1,11 +1,7 @@
 import secrets
 from typing import Literal
-from enum import StrEnum, auto
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class VoteWeekParity(StrEnum):
-    odd = auto()
-    even = auto()
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
@@ -22,7 +18,14 @@ class Config(BaseSettings):
     TARGET_CHANNEL_ID: int = -1
     TAG_ROLE_ID: int = -1
     GUILD_ID: int = -1
-    DEFAULT_WEEK_VOTE: VoteWeekParity = VoteWeekParity.odd
+
+    DATA_PATH: str = "call2arms/data_storage/data.json"
+    SAVE_INTERVAL_MINUTES: int = 10
+    VOTE_WINDOW_DAYS: int = 7
+
+    SESSIONS_PLANNING_WINDOW: int = 4
+    AUTOSCHEDULE_INTERVAL_HOURS: int = 24
+    MIN_VOTES: int = 4
 
 
 def get_config() -> Config:
