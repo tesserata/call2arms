@@ -2,6 +2,7 @@ from typing import Any, Awaitable, Callable, Coroutine
 
 import discord
 
+from bot.ui import campaigns
 from call2arms.bot.discord_service import DiscordService
 from call2arms.bot.ui._base import (
     ActionButton,
@@ -116,7 +117,7 @@ class SessionView(_BaseLayout):
 
     def _text(self) -> str:
         lines = [
-            f"## Session #{self.session.number}",
+            f"## {self.session.campaign_name} session #{self.session.number}",
             f"**Starts:** {fmt_ts(self.session.starts_at, 'F')}",
             f"**Status:** {self.session.status}",
         ]
