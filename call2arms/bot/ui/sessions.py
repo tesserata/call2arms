@@ -63,7 +63,7 @@ class SessionView(_BaseLayout):
         store: DataStore,
         discord_service: DiscordService,
         session: Session,
-        attendees: list[discord.User] | None = None,
+        attendees: list[discord.Member] | None = None,
         editable: bool = True,
         back_factory: Awaitable[Any] = None,
     ) -> None:
@@ -97,7 +97,7 @@ class SessionView(_BaseLayout):
     @staticmethod
     async def _fetch_attendees(
         discord_service: DiscordService, session: Session
-    ) -> list[discord.User]:
+    ) -> list[discord.Member]:
         if not session.announced:
             return []
         return (

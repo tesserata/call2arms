@@ -61,19 +61,29 @@ class DiscordService:
         channel_id: int,
         message_id: int,
         emoji: str,
-        target_role: int | None = None,
-    ) -> list[discord.User]:
+        role_id: int | None = None,
+    ) -> list[discord.Member]:
         try:
             channel = await self.get_channel(channel_id)
             message = await channel.fetch_message(message_id)
-            for reaction in message.reactions:
-                if str(reaction.emoji) == emoji:
-                    users = [u async for u in reaction.users() if not u.bot]
-                    if target_role:
-                        users = [u for u in users if get(u.roles, id=target_role)]
-
-                    return users
-        except Exception as e:
-            logger.exception(e)
-
+        except (discord.NotFound, discord.HTTPException):
+            return []
+        guild = channel.guild
+        members: list[discord.Member] = []
+        for reaction in message.reactions:
+            if str(reaction.emoji) != emoji:
+                continue
+            async for user in reaction.users():
+                if user.bot:
+                    continue
+                member = guild.get_member(user.id)
+                if member is None:
+                    try:
+                        member = await guild.fetch_member(user.id)
+                    except discord.NotFound:
+                        continue
+                if role_id is not None and get(member.roles, id=role_id) is None:
+                    continue
+                members.append(member)
+            return members
         return []
