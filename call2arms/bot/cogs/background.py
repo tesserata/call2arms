@@ -106,6 +106,7 @@ class BackgroundCog(commands.Cog):
                     session.announcement_channel_id,
                     session.announcement_message_id,
                     "🐐",
+                    target_role=self.config.TAG_ROLE_ID,
                 )
                 if len(votes) >= self.config.MIN_VOTES:
                     view = await SessionView.create(
