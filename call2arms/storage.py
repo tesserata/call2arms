@@ -126,6 +126,7 @@ class DataStore:
         for occurrence in campaign.get_next_sessions_time(count):
             session = Session(
                 starts_at=occurrence,
+                scheduled_for=occurrence,
                 campaign_id=campaign_id,
                 campaign_name=campaign.name,
             )

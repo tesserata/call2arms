@@ -9,6 +9,7 @@ from dateutil.rrule import rrulestr
 @dataclass
 class Session:
     starts_at: datetime
+    scheduled_for: datetime | None
     cancelled: bool = False
     announced: bool = False
     confirmed: bool = False
@@ -22,6 +23,9 @@ class Session:
     def to_dict(self) -> dict[str, Any]:
         return {
             "starts_at": self.starts_at.timestamp(),
+            "scheduled_for": (
+                self.scheduled_for.timestamp() if self.scheduled_for else None
+            ),
             "cancelled": self.cancelled,
             "announced": self.announced,
             "confirmed": self.confirmed,
@@ -37,6 +41,11 @@ class Session:
     def from_dict(cls, data: dict):
         return cls(
             starts_at=datetime.fromtimestamp(data["starts_at"], UTC),
+            scheduled_for=(
+                datetime.fromtimestamp(data["scheduled_for"], UTC)
+                if data.get("scheduled_for")
+                else None
+            ),
             cancelled=data.get("cancelled", False),
             announced=data.get("announced", False),
             confirmed=data.get("confirmed", False),
@@ -148,7 +157,9 @@ class Campaign:
 
     def get_announced_sessions(self) -> list[Session]:
         announced_sessions = [
-            s for s in self.sessions.values() if s.announced and not s.cancelled and s.upcoming
+            s
+            for s in self.sessions.values()
+            if s.announced and not s.cancelled and s.upcoming
         ]
         announced_sessions.sort(key=lambda s: s.starts_at)
         return announced_sessions
@@ -168,7 +179,7 @@ class Campaign:
         if not self.rrule:
             return
 
-        scheduled_dates = {s.starts_at.date() for s in self.sessions.values()}
+        scheduled_dates = {(s.scheduled_for or s.starts_at).date() for s in self.sessions.values()}
         rule = rrulestr(self.rrule, dtstart=self.started_at)
 
         upcoming = [s for s in self.sessions.values() if s.upcoming and not s.cancelled]
