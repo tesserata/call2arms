@@ -9,7 +9,7 @@ from dateutil.rrule import rrulestr
 @dataclass
 class Session:
     starts_at: datetime
-    scheduled_for: datetime | None
+    scheduled_for: datetime | None = None
     cancelled: bool = False
     announced: bool = False
     confirmed: bool = False
@@ -39,13 +39,15 @@ class Session:
 
     @classmethod
     def from_dict(cls, data: dict):
+        starts_at = datetime.fromtimestamp(data["starts_at"], UTC)
+        scheduled_for = (
+            datetime.fromtimestamp(data["scheduled_for"], UTC)
+            if data.get("scheduled_for")
+            else starts_at
+        )
         return cls(
-            starts_at=datetime.fromtimestamp(data["starts_at"], UTC),
-            scheduled_for=(
-                datetime.fromtimestamp(data["scheduled_for"], UTC)
-                if data.get("scheduled_for")
-                else None
-            ),
+            starts_at=starts_at,
+            scheduled_for=scheduled_for,
             cancelled=data.get("cancelled", False),
             announced=data.get("announced", False),
             confirmed=data.get("confirmed", False),
